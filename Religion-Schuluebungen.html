@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Religion – Schulübungen · 3AVK</title>
+<style>
+:root{
+  --accent:#80397b;
+  --accent-2:#5e2a63;
+  --accent-tint:#f6eef7;
+  --accent-tint-2:#efe1f1;
+  --ink:#242124;
+  --muted:#6f6a73;
+  --line:#e8e3ec;
+  --paper:#ffffff;
+  --bg:#f3f1f5;
+  --sb-w:300px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Roboto,Arial,sans-serif;
+  color:var(--ink);background:var(--bg);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+.app{display:flex;height:100vh;overflow:hidden;}
+
+/* ---------- Sidebar ---------- */
+.sidebar{width:var(--sb-w);flex-shrink:0;background:var(--paper);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;}
+.nb-head{padding:20px 18px 14px;border-bottom:1px solid var(--line);}
+.nb-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+.nb-title{display:flex;align-items:center;gap:10px;margin-top:8px;}
+.nb-title .mark{width:16px;height:21px;border-radius:3px;background:linear-gradient(160deg,var(--accent),var(--accent-2));flex-shrink:0;box-shadow:0 1px 2px rgba(0,0,0,.18);}
+.nb-title h1{font-size:21px;font-weight:700;margin:0;letter-spacing:-.01em;}
+.nb-sub{font-size:12.5px;color:var(--muted);margin-top:5px;}
+
+.sec-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 6px;}
+.sec-name{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;color:var(--accent-2);}
+.sec-name .tab-bar{width:3px;height:15px;border-radius:2px;background:var(--accent);}
+.count{font-size:11px;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:2px 9px;}
+
+.nav-list{flex:1;overflow-y:auto;padding:4px 10px 16px;}
+.nav{width:100%;display:flex;align-items:flex-start;gap:11px;text-align:left;background:transparent;border:0;border-radius:8px;padding:10px;cursor:pointer;color:var(--ink);position:relative;transition:background .12s ease;}
+.nav:hover{background:#f5f3f7;}
+.nav.active{background:var(--accent-tint);}
+.nav.active::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--accent);}
+.nav-num{flex-shrink:0;width:24px;height:24px;border-radius:7px;background:var(--bg);border:1px solid var(--line);color:var(--muted);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px;}
+.nav.active .nav-num{background:var(--accent);border-color:var(--accent);color:#fff;}
+.nav-text{display:flex;flex-direction:column;min-width:0;}
+.nav-title{font-size:13.5px;font-weight:600;line-height:1.3;}
+.nav.active .nav-title{color:var(--accent-2);}
+.nav-date{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.sb-foot{padding:11px 18px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);}
+
+/* ---------- Main ---------- */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.toolbar{flex-shrink:0;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:rgba(255,255,255,.85);backdrop-filter:saturate(180%) blur(8px);border-bottom:1px solid var(--line);}
+.tb-left{display:flex;align-items:center;gap:12px;min-width:0;}
+.hamb{display:none;background:transparent;border:1px solid var(--line);border-radius:8px;width:34px;height:34px;cursor:pointer;align-items:center;justify-content:center;color:var(--ink);}
+.hamb svg{width:18px;height:18px;}
+.crumb{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.crumb b{color:var(--ink);font-weight:600;}
+.print-btn{display:flex;align-items:center;gap:7px;background:transparent;border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;white-space:nowrap;}
+.print-btn:hover{background:#f5f3f7;border-color:#d9d3df;}
+
+.content{flex:1;overflow-y:auto;padding:30px 24px 56px;background-color:var(--bg);background-image:radial-gradient(#d9d2e0 1px,transparent 1px);background-size:22px 22px;}
+.sheet-wrap{max-width:780px;margin:0 auto;}
+
+/* ---------- Page card ---------- */
+.page{display:none;}
+.page.active{display:block;animation:fade .22s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.sheet{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:38px 40px 40px;box-shadow:0 1px 2px rgba(40,30,50,.04),0 12px 34px rgba(40,30,50,.06);}
+.p-meta{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);font-weight:500;}
+.p-meta svg{width:14px;height:14px;opacity:.85;}
+.p-title{font-size:30px;line-height:1.15;font-weight:700;letter-spacing:-.02em;margin:11px 0 0;}
+.p-rule{height:1px;background:linear-gradient(90deg,var(--accent-tint-2),transparent);margin:22px 0;}
+
+.sheet p{font-size:15.5px;line-height:1.7;margin:0 0 14px;color:#2c282f;}
+.sheet p.lead{font-size:16px;color:#39343f;}
+.sheet h3{font-size:16.5px;font-weight:700;margin:26px 0 10px;display:flex;align-items:center;gap:9px;color:var(--ink);}
+.sheet h3 .hb{width:3px;height:17px;border-radius:2px;background:var(--accent);flex-shrink:0;}
+ul.clean,ol.clean{margin:6px 0 16px;padding:0 0 0 2px;list-style:none;}
+ul.clean li{position:relative;padding:5px 0 5px 22px;font-size:15.5px;line-height:1.55;color:#2c282f;}
+ul.clean li::before{content:"";position:absolute;left:4px;top:12px;width:6px;height:6px;border-radius:50%;background:var(--accent);}
+ol.clean{counter-reset:s;}
+ol.clean li{position:relative;padding:7px 0 7px 36px;font-size:15.5px;line-height:1.55;counter-increment:s;color:#2c282f;}
+ol.clean li::before{content:counter(s);position:absolute;left:0;top:5px;width:23px;height:23px;border-radius:7px;background:var(--accent-tint);color:var(--accent-2);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+li b{font-weight:700;color:var(--ink);}
+
+.callout{background:var(--accent-tint);border:1px solid var(--accent-tint-2);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:8px 0 18px;font-size:15.5px;line-height:1.6;}
+.callout b{color:var(--accent-2);}
+.note{font-size:14px;color:var(--muted);font-style:italic;border-top:1px dashed var(--line);padding-top:12px;margin-top:8px;}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px;}
+.chip{background:#f4f1f6;border:1px solid var(--line);color:#3d3743;border-radius:20px;padding:7px 14px;font-size:13.5px;font-weight:500;}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:8px 0 4px;}
+.col-card{background:#faf8fb;border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+.col-card .ch{font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--accent-2);margin:0 0 8px;}
+.col-card ul.clean{margin:0;}
+
+.dlg{background:#faf8fb;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:0 0 14px;}
+.dlg-h{font-size:12.5px;font-weight:700;color:var(--accent-2);margin:0 0 12px;letter-spacing:.02em;text-transform:uppercase;}
+.line{display:flex;gap:11px;margin:0 0 11px;}
+.line:last-child{margin-bottom:0;}
+.spk{flex-shrink:0;font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:6px;padding:3px 8px;height:fit-content;margin-top:2px;white-space:nowrap;}
+.line.b .spk{background:#8a8490;}
+.line p{margin:0;font-size:15px;line-height:1.55;color:#322d38;}
+
+.pager{display:flex;gap:12px;max-width:780px;margin:22px auto 0;}
+.pg-btn{flex:1;display:flex;flex-direction:column;gap:3px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 16px;cursor:pointer;text-align:left;transition:border-color .12s,background .12s;min-width:0;}
+.pg-btn:hover:not(:disabled){border-color:var(--accent-tint-2);background:#faf8fb;}
+.pg-btn:disabled{opacity:.4;cursor:default;}
+.pg-btn.next{text-align:right;align-items:flex-end;}
+.pg-dir{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);}
+.pg-name{font-size:13.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+
+.overlay{display:none;position:fixed;inset:0;background:rgba(20,15,25,.4);z-index:40;}
+
+@media (max-width:820px){
+  .app{display:block;height:auto;min-height:100vh;overflow:visible;}
+  .sidebar{position:fixed;top:0;left:0;height:100%;width:84%;max-width:330px;transform:translateX(-100%);transition:transform .25s ease;z-index:50;box-shadow:0 0 40px rgba(0,0,0,.25);}
+  .sidebar.open{transform:none;}
+  .main{overflow:visible;}
+  .toolbar{position:sticky;top:0;z-index:30;}
+  .hamb{display:flex;}
+  .content{overflow:visible;padding:18px 14px 48px;}
+  .sheet{padding:24px 20px 28px;border-radius:12px;}
+  .p-title{font-size:24px;}
+  .cols{grid-template-columns:1fr;gap:12px;}
+  .overlay.show{display:block;}
+  .pager{gap:8px;}
+  .pg-name{font-size:12.5px;}
+}
+
+@media print{
+  .sidebar,.toolbar,.pager,.overlay{display:none !important;}
+  .app{display:block;height:auto;overflow:visible;}
+  .main,.content{overflow:visible;}
+  .content{padding:0;background:#fff;}
+  .page{display:block !important;page-break-after:always;}
+  .page:last-child{page-break-after:auto;}
+  .sheet{box-shadow:none;border:none;border-radius:0;padding:0 0 12px;max-width:100%;}
+  .sheet-wrap{max-width:100%;}
+  body{background:#fff;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="nb-head">
+      <div class="nb-label">Notizbuch</div>
+      <div class="nb-title"><span class="mark"></span><h1>Religion</h1></div>
+      <div class="nb-sub">3AVK · 2. Semester 2025/26</div>
+    </div>
+    <div class="sec-row">
+      <span class="sec-name"><span class="tab-bar"></span>Schulübungen</span>
+      <span class="count">11 Einheiten</span>
+    </div>
+    <nav class="nav-list">
+      <button class="nav" data-target="p8"><span class="nav-num">8</span><span class="nav-text"><span class="nav-title">Lebenssituation Jugendlicher</span><span class="nav-date">25. Feb 2026</span></span></button>
+      <button class="nav" data-target="p9"><span class="nav-num">9</span><span class="nav-text"><span class="nav-title">Ein Tag im Leben eines Ultras</span><span class="nav-date">13. Mär 2026</span></span></button>
+      <button class="nav" data-target="p10"><span class="nav-num">10</span><span class="nav-text"><span class="nav-title">Das bewegt mich</span><span class="nav-date">18. Mär 2026</span></span></button>
+      <button class="nav" data-target="p11"><span class="nav-num">11</span><span class="nav-text"><span class="nav-title">Was ich mit Jesus verbinde</span><span class="nav-date">8. Apr 2026</span></span></button>
+      <button class="nav" data-target="p12"><span class="nav-num">12</span><span class="nav-text"><span class="nav-title">Der historische Jesus</span><span class="nav-date">10. Apr 2026</span></span></button>
+      <button class="nav" data-target="p13"><span class="nav-num">13</span><span class="nav-text"><span class="nav-title">Die Vision vom Messias</span><span class="nav-date">29. Apr 2026</span></span></button>
+      <button class="nav" data-target="p14"><span class="nav-num">14</span><span class="nav-text"><span class="nav-title">Die Wunder Jesu</span><span class="nav-date">8. Mai 2026</span></span></button>
+      <button class="nav" data-target="p15"><span class="nav-num">15</span><span class="nav-text"><span class="nav-title">Aufbau der Wundergeschichten</span><span class="nav-date">13. Mai 2026</span></span></button>
+      <button class="nav" data-target="p16"><span class="nav-num">16</span><span class="nav-text"><span class="nav-title">Die 4 Evangelien</span><span class="nav-date">20. Mai 2026</span></span></button>
+      <button class="nav" data-target="p17"><span class="nav-num">17</span><span class="nav-text"><span class="nav-title">Pfingsten – Entstehung der Kirche</span><span class="nav-date">29. Mai 2026</span></span></button>
+      <button class="nav" data-target="p18"><span class="nav-num">18</span><span class="nav-text"><span class="nav-title">Religiöse Sondergruppen</span><span class="nav-date">10. Jun 2026</span></span></button>
+    </nav>
+    <div class="sb-foot">Mitschrift · Religion (RK)</div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="toolbar">
+      <div class="tb-left">
+        <button class="hamb" id="hamb" aria-label="Menü öffnen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <div class="crumb">Religion <span style="opacity:.45">▸</span> <b>Schulübungen</b></div>
+      </div>
+      <button class="print-btn" id="printBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M6 14h12v7H6z"/></svg>Drucken</button>
+    </div>
+
+    <div class="content" id="content">
+      <div class="sheet-wrap">
+
+        <!-- 8 -->
+        <article class="page" id="p8"><div class="sheet">
+          <div class="p-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>8. Schulübung · Mittwoch, 25. Februar 2026</div>
+          <h2 class="p-title">Lebenssituation Jugendlicher</h2>
+          <div class="p-rule"></div>
+          <p class="lead">Wie Erwachsene oft über „die Jugend von heute“ denken – typische Vorurteile:</p>
+          <ul class="clean">
+            <li><b>Ständig am Handy:</b> Jugendliche hängen nur am Bildschirm und bekommen vom „echten Leben“ angeblich nichts mit.</li>
+            <li><b>Arbeitsscheu:</b> Sie wollen viel verdienen, scheuen aber Überstunden und körperliche Arbeit.</li>
+            <li><b>Respektlos:</b> Freche Antworten, wenig Benehmen gegenüber Älteren – und das Gefühl, im Mittelpunkt zu stehen.</li>
+            <li><b>Empfindlich:</b> Schnell beleidigt wegen Kleinigkeiten und wenig belastbar.</li>
+          </ul>
+          <p class="note">Solche Aussagen sind pauschal und werden den meisten Jugendlichen nicht gerecht.</p>
+        </div></article>
+
+        <!-- 9 -->
+        <article class="page" id="p9"><div class="sheet">
+          <div class="p-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>9. Schulübung · Freitag, 13. März 2026</div>
+          <h2 class="p-title">Ein Tag im Leben eines Ultras</h2>
+          <div class="p-rule"></div>
+          <p>Für viele Ultras beginnt ein Spieltag schon früh am Morgen. Zuerst trifft man sich mit der eigenen Gruppe – etwa an einem festen Treffpunkt in der Stadt oder am Bahnhof. Dort tauscht man sich über das bevorstehende Spiel aus und fährt anschließend gemeinsam zum Stadion, bei Auswärtsspielen auch in eine andere Stadt.</p>
+          <p>Vor dem Anpfiff bereiten einige Ultras den Fanblock vor: Sie hängen Fahnen auf oder bauen eine Choreografie auf. Während des Spiels stehen sie die gesamte Zeit im Block, singen Lieder und feuern ihre Mannschaft lautstark an. Ihr Ziel ist es, im Stadion für eine möglichst gute Stimmung zu sorgen.</p>
+          <p>Nach dem Abpfiff bleibt die Gruppe oft noch eine Weile zusammen. Manche fahren direkt nach Hause, andere lassen den Tag gemeinsam ausklingen und sprechen über das Spiel. Für viele Ultras zählt nicht allein das Spiel selbst, sondern vor allem die Gemeinschaft in der Gruppe.</p>
+        </div></article>
+
+        <!-- 10 -->
+        <article class="page" id="p10"><div class="sheet">
+          <div class="p-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>10. Schulübung · Mittwoch, 18. März 2026</div>
+          <h2 class="p-title">Das bewegt mich</h2>
+          <div class="p-rule"></div>
+          <p class="lead">Was mich – und Jugendliche, die ich kenne – bewegt: meine Träume und Ängste.</p>
+          <div class="cols">
+            <div class="col-card">
+              <p class="ch">Träume</p>
+              <ul class="clean">
+                <li>Frieden auf der Welt</li>
+                <li>Gesundheit für mich und meine Familie</li>
+                <li>Gute Noten in der Schule</li>
+                <li>Zufriedenheit mit mir selbst</li>
+                <li>Genug Mittel, um mir meine Träume zu erfüllen</li>
+              </ul>
+            </div>
+            <div class="col-card">
+              <p class="ch">Ängste</p>
+              <ul class="clean">
+                <li>dass ein (Welt-)Krieg ausbricht</li>
+                <li>persönliche Rückschläge</li>
+                <li>später keine Arbeit zu finden</li>
+              </ul>
+            </div>
+          </div>
+        </div></article>
+
+        <!-- 11 -->
+        <article class="page" id="p11"><div class="sheet">
+          <div class="p-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>11. Schulübung · Mittwoch, 8. April 2026</div>
+          <h2 class="p-title">Was ich mit Jesus verbinde</h2>
+          <div class="p-rule"></div>
+          <p class="lead">Begriffe und Werte, die ich mit Jesus Christus verbinde:</p>
+          <div class="chips">
+            <span class="chip">Güte</span>
+            <span class="chip">Frieden</span>
+            <span class="chip">Liebe</span>
+            <span class="chip">Nächstenliebe</span>
+            <span class="chip">Glaube</span>
+            <span class="chip">Hoffnung</span>
+            <span class="chip">Vergebung</span>
+            <span class="chip">Barmherzigkeit</span>
+            <span class="chip">Erlösung</span>
+            <span class="chip">Kreuz</span>
+            <span class="chip">Auferstehung</span>
+            <span class="chip">Gott</span>
+          </div>
+        </div></article>
+
+        <!-- 12 -->
+        <article class="page" id="p12"><div class="sheet">
+          <div class="p-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>12. Schulübung · Freitag, 10. April 2026</div>
+          <h2 class="p-title">Der historische Jesus</h2>
+          <div class="p-rule"></div>
+          <h3><span class="hb"></span>Historisch weitgehend gesichert</h3>
+          <ul class="clean">
+            <li><b>Lebenszeit:</b> ca. 7–4 v. Chr. bis 30–33 n. Chr.</li>
+            <li><b>Herkunft:</b> Jude aus Nazaret</li>
+            <li><b>Öffentliches Auftreten:</b> ab etwa 30 Jahren</li>
+            <li><b>Zentrale Botschaft:</b> das Reich Gottes</li>
+            <li><b>Rollen:</b> Kritiker, Moralist, Prediger und Wunderheiler</li>
+            <li><b>Tod:</b> Hinrichtung durch Kreuzigung</li>
+          </ul>
+        </div></article>
+
+        <!-- 13 -->
+        <article class="page" id="p13"><div class="sheet">
+          <div class="p-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>13. Schulübung · Mittwoch, 29. April 2026</div>
+          <h2 class="p-title">Die Vision vom Messias</h2>
+          <div class="p-rule"></div>
+          <ul class="clean">
+            <li>stammt aus dem jüdischen Glauben</li>
+            <li>Ursprung um ca. 1000 v. Chr., zur Zeit von König David</li>
+            <li>wurde von den Propheten verkündet</li>
+            <li>ist besonders in Krisenzeiten gegenwärtig – als Hoffnung auf einen Retter</li>
+          </ul>
+        </div></article>
+
+        <!-- 14 -->
+        <article class="page" id="p14"><div class="sheet">
+          <div class="p-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>14. Schulübung · Freitag, 8. Mai 2026</div>
+          <h2 class="p-title">Die Wunder Jesu</h2>
+          <div class="p-rule"></div>
+          <div class="callout"><b>Wunder</b> = ein unerwartetes, außergewöhnliches Ereignis, das sich rational nicht (vollständig) erklären lässt.</div>
+          <h3><span class="hb"></span>Bekannte Wunder Jesu</h3>
+          <ul class="clean">
+            <li>Auferstehung von den Toten</li>
+            <li>Gehen über das Wasser</li>
+            <li>Verwandlung von Wasser in Wein</li>
+            <li>Heilung von Blinden</li>
+            <li>Geburt von einer Jungfrau</li>
+            <li>Vermehrung von Brot und Fischen</li>
+            <li>Heilung von Kranken</li>
+            <li>Austreibung von Dämonen</li>
+          </ul>
+        </div></article>
+
+        <!-- 15 -->
+        <article class="page" id="p15"><div class="sheet">
+          <div class="p-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>15. Schulübung · Mittwoch, 13. Mai 2026</div>
+          <h2 class="p-title">Aufbau der Wundergeschichten</h2>
+          <div class="p-rule"></div>
+          <p class="lead">Wundergeschichten folgen meist einem ähnlichen Aufbau:</p>
+          <ol class="clean">
+            <li><b>Einleitung:</b> Die handelnden Personen treten auf.</li>
+            <li><b>Exposition:</b> Die Not bzw. das Problem wird beschrieben.</li>
+            <li><b>Zentrum:</b> die eigentliche Wunderhandlung Jesu.</li>
+            <li><b>Abschluss:</b> Das Wunder wird bestätigt, die Anwesenden reagieren staunend.</li>
+          </ol>
+        </div></article>
+
+        <!-- 16 -->
+        <article class="page" id="p16"><div class="sheet">
+          <div class="p-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>16. Schulübung · Mittwoch, 20. Mai 2026</div>
+          <h2 class="p-title">Die 4 Evangelien</h2>
+          <div class="p-rule"></div>
+          <p class="lead">Die vier Evangelien: <b>Matthäus, Markus, Lukas</b> und <b>Johannes</b>.</p>
+          <h3><span class="hb"></span>Die Zwei-Quellen-Theorie</h3>
+          <ul class="clean">
+            <li>Das <b>Markusevangelium</b> (um 70 n. Chr.) ist das älteste der vier Evangelien.</li>
+            <li><b>Matthäus</b> (um 80 n. Chr.) und <b>Lukas</b> (um 85 n. Chr.) griffen auf zwei gemeinsame Quellen zurück: das Markusevangelium und die Spruchquelle <b>Q</b> (Sonderquelle).</li>
+            <li>Das <b>Johannesevangelium</b> entstand eigenständig und unterscheidet sich deutlich von den übrigen drei.</li>
+          </ul>
+          <p class="note">Matthäus, Markus und Lukas werden wegen ihrer Ähnlichkeit auch die synoptischen Evangelien genannt.</p>
+        </div></article>
+
+        <!-- 17 -->
+        <article class="page" id="p17"><div class="sheet">
+          <div class="p-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>17. Schulübung · Freitag, 29. Mai 2026</div>
+          <h2 class="p-title">Pfingsten – Die Entstehung der Kirche</h2>
+          <div class="p-rule"></div>
+          <ul class="clean">
+            <li>Pfingsten wird <b>50 Tage nach Ostern</b> gefeiert.</li>
+            <li>Der <b>Heilige Geist</b> kommt auf die Jünger herab.</li>
+            <li>Gilt als die „<b>Geburtsstunde der Kirche</b>“.</li>
+            <li>Beginn der Verkündigung und der Ausbreitung des christlichen Glaubens.</li>
+          </ul>
+        </div></article>
+
+        <!-- 18 -->
+        <article class="page" id="p18"><div class="sheet">
+          <div class="p-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>18. Schulübung · Mittwoch, 10. Juni 2026</div>
+          <h2 class="p-title">Religiöse Sondergruppen</h2>
+          <div class="p-rule"></div>
+          <p class="lead">Recherche zu religiösen Sondergruppen und verwandten Phänomenen.</p>
+
+          <h3><span class="hb"></span>Sekten / religiöse Sondergruppen</h3>
+          <ul class="clean">
+            <li>Gemeinschaften, die sich von den großen Religionen unterscheiden</li>
+            <li>haben oft eigene Lehren und Regeln</li>
+            <li>Wichtig: Nicht jede religiöse Sondergemeinschaft ist automatisch eine Sekte.</li>
+          </ul>
+
+          <h3><span class="hb"></span>Religiöse Verbrechen</h3>
+          <ul class="clean">
+            <li>Straftaten, die religiös begründet werden</li>
+            <li>Beispiele: Gewalt, Terroranschläge oder Zwang durch religiöse Gruppen</li>
+            <li>Bekanntes Beispiel: <b>Aum Shinrikyo</b> (Sarin-Anschlag in Tokio, 1995)</li>
+          </ul>
+
+          <h3><span class="hb"></span>Geheimbünde</h3>
+          <ul class="clean">
+            <li>Organisationen mit geheimen Ritualen und Mitgliedschaften</li>
+            <li>Beispiele: Freimaurer, Illuminaten</li>
+          </ul>
+
+          <h3><span class="hb"></span>Religiöse Verschwörungen</h3>
+          <ul class="clean">
+            <li>Behauptungen über geheime religiöse oder politische Machtgruppen</li>
+            <li>Beispiele: Illuminaten- und Freimaurer-Verschwörungen</li>
+            <li>Meist fehlen wissenschaftliche Beweise.</li>
+          </ul>
+
+          <h3><span class="hb"></span>Angewandte Beispiele</h3>
+          <div class="dlg">
+            <p class="dlg-h">Religiöse Verschwörung – Illuminaten</p>
+            <div class="line"><span class="spk">Person 1</span><p>„Ein Beispiel für eine religiöse Verschwörung sind die Illuminaten – ein Geheimbund, der 1776 in Bayern gegründet wurde.“</p></div>
+            <div class="line b"><span class="spk">Person 2</span><p>„Manche behaupten bis heute, die Illuminaten würden heimlich die Welt steuern. Beweise dafür gibt es allerdings keine.“</p></div>
+          </div>
+          <div class="dlg">
+            <p class="dlg-h">Geheimbund – Freimaurer</p>
+            <div class="line"><span class="spk">Person 1</span><p>„Die Freimaurer sind ein Zusammenschluss von Menschen mit gemeinsamen Werten und Traditionen.“</p></div>
+            <div class="line b"><span class="spk">Person 2</span><p>„Weil sie eigene Rituale und nicht-öffentliche Treffen haben, werden sie oft als Geheimbund bezeichnet.“</p></div>
+          </div>
+        </div></article>
+
+        <!-- Pager -->
+        <div class="pager">
+          <button class="pg-btn prev" id="prevBtn"><span class="pg-dir">← Zurück</span><span class="pg-name"></span></button>
+          <button class="pg-btn next" id="nextBtn"><span class="pg-dir">Weiter →</span><span class="pg-name"></span></button>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<script>
+const order = ['p8','p9','p10','p11','p12','p13','p14','p15','p16','p17','p18'];
+const titles = {
+  p8:'Lebenssituation Jugendlicher', p9:'Ein Tag im Leben eines Ultras', p10:'Das bewegt mich',
+  p11:'Was ich mit Jesus verbinde', p12:'Der historische Jesus', p13:'Die Vision vom Messias',
+  p14:'Die Wunder Jesu', p15:'Aufbau der Wundergeschichten', p16:'Die 4 Evangelien',
+  p17:'Pfingsten – Entstehung der Kirche', p18:'Religiöse Sondergruppen'
+};
+const pages = document.querySelectorAll('.page');
+const navs  = document.querySelectorAll('.nav');
+const content = document.getElementById('content');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+function closeSidebar(){ sidebar.classList.remove('open'); overlay.classList.remove('show'); }
+function openSidebar(){ sidebar.classList.add('open'); overlay.classList.add('show'); }
+
+function show(id){
+  pages.forEach(p => p.classList.toggle('active', p.id === id));
+  navs.forEach(n => n.classList.toggle('active', n.dataset.target === id));
+  const i = order.indexOf(id);
+  if(i > 0){ prevBtn.disabled=false; prevBtn.dataset.target=order[i-1]; prevBtn.querySelector('.pg-name').textContent=titles[order[i-1]]; }
+  else { prevBtn.disabled=true; prevBtn.querySelector('.pg-name').textContent='—'; }
+  if(i < order.length-1){ nextBtn.disabled=false; nextBtn.dataset.target=order[i+1]; nextBtn.querySelector('.pg-name').textContent=titles[order[i+1]]; }
+  else { nextBtn.disabled=true; nextBtn.querySelector('.pg-name').textContent='—'; }
+  content.scrollTo({top:0});
+  window.scrollTo({top:0});
+  closeSidebar();
+}
+
+navs.forEach(n => n.addEventListener('click', () => show(n.dataset.target)));
+prevBtn.addEventListener('click', () => { if(!prevBtn.disabled) show(prevBtn.dataset.target); });
+nextBtn.addEventListener('click', () => { if(!nextBtn.disabled) show(nextBtn.dataset.target); });
+document.getElementById('hamb').addEventListener('click', openSidebar);
+overlay.addEventListener('click', closeSidebar);
+document.getElementById('printBtn').addEventListener('click', () => window.print());
+document.addEventListener('keydown', e => {
+  if(e.target.matches('input,textarea')) return;
+  if(e.key === 'ArrowLeft'  && !prevBtn.disabled) show(prevBtn.dataset.target);
+  if(e.key === 'ArrowRight' && !nextBtn.disabled) show(nextBtn.dataset.target);
+});
+
+show('p8');
+</script>
+</body>
+</html>
